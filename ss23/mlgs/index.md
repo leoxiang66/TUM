@@ -1,2 +1,3 @@
 # Outline
-- [ML for Graph and Sequential Data](ar/)
+- [Autoregressive Models](ar/)
+- [Markov Chain](mc/)

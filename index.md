@@ -1,2 +1,2 @@
 # Outline
-- [ML for Graph and Sequential Data](mlgs/ar)
+- [ss23](ss23/)

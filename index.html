@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autoregressive Models</title>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<script type="text/javascript"
+  src="http://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+</head>
+
+<body>
+    <h1>Autoregressive Models</h1>
+    <h2>Motivation</h2>
+    <p>How to handle temporal sequential data $X_{1}, X_{2}, \ldots, X_{T}$? For example, $X_{t}$ = temperature on the $t$-th day.</p>
+    <ul>
+        <li>Data from later time points depend on data from earlier time points.</li>
+        <li>Data is not i.i.d.</li>
+        <li>The index $t$ can correspond to time, location, etc.</li>
+    </ul>
+    <p>Autoregressive models (AR) are used in these cases.</p>
+    <p><strong>Assumption:</strong></p>
+    <ul>
+        <li>Observations/data are continuous. In this case, AR models can be transformed into a probability distribution model: $P\left(X_{t} \mid X_{t-1}, \ldots X_{t-p}\right) \sim N\left(c+\sum_{i=1}^{p} \varphi_{i} X_{t-i}, \sigma\right)$. AR → probabilistic graphical models.</li>
+        <li>Time steps are discrete.</li>
+    </ul>
+    <p>If observations are discrete, refer to <a href="https://www.wolai.com/5zF5a5i3JJRJa5eDY8hsv6.md">Markov chains</a>.</p>
+    <h2>AR Definition</h2>
+    <p>An autoregressive model $AR(p)$ of order $p$ is defined as:</p>
+    <p>$$X_{t}=c+\sum_{i=1}^{p} \varphi_{i} X_{t-i}+\varepsilon_{t}$$</p>
+    <p>where:</p>
+    <ul>
+        <li>$\varphi_{1}, \ldots, \varphi_{p}$ are the parameters.</li>
+        <li>$c$ is a constant parameter.</li>
+        <li>$\varepsilon_{t} \sim N(0, \sigma)$ is a white noise. (This is not a parameter, but a sample under the fixed normal distribution.)</li>
+        <li>The variable $X_{t-i}$ is the lagged value at time $i$.</li>
+    </ul>
+    <h2>AR → Probabilistic Graphical Models</h2>
+    <p>AR → Probability distribution model:</p>
+    <p>$$P\left(X_{t} \mid X_{t-1}, \ldots X_{t-p}\right) \sim N\left(c+\sum_{i=1}^{p} \varphi_{i} X_{t-i}, \sigma\right)$$</p>
+    <p>The corresponding graphical model:</p>
+    <img src="image/image_dgJYzgeK1k.png" alt="Graphical model representation">
+    <h3>Statistics</h3>
+    <p>$t:$ time point</p>
+    <p>$i:$ time interval</p>
+    <ol>
+        <li>The mean function of an AR model is $\mu(t)=E\left[X_{t}\right]$. By default, it depends on $t$.
+        <ul>
+            <li>In the stationary case: $E\left[X_{t}\right]$ is constant = $\mu$.</li>
+        </ul>
+    </li>
+    <li>The autocovariance $\gamma(t, i)=\operatorname{Cov}\left(X_{t}, X_{t-i}\right)$.
+        <ul>
+            <li>By default, it depends on $t$ and $i$.</li>
+            <li>In the stationary case: only depends on $i$. Thus, the autocovariance between two data points with the same interval is equal: $\gamma_{i}=\operatorname{Cov}\left(X_{t}, X_{t-i}\right)=\operatorname{Cov}\left(X_{t-i}, X_{t}\right)=\gamma_{-i}$.</li>
+        </ul>
+    </li>
+    <li>The autocovariance function can be normalized to give the Pearson autocorrelation function $\rho(t, i)=\frac{\operatorname{Cov}\left(X_{t}, X_{t-i}\right)}{\sqrt{\operatorname{Var}\left(X_{t}\right)} \sqrt{\operatorname{Var}\left(X_{t-i}\right)}}$. It lies in $[-1,1]$.</li>
+</ol>
+<p>Autocovariance and Pearson autocorrelation both reflect the degree of dependence between two-time series data points.</p>
+<h2>Stationarity</h2>
+<p>A process is said to be stationary if:</p>
+<ol>
+    <li>$E\left[X_{t}\right]=E\left[X_{t-i}\right]=\mu, \forall t, \forall i$</li>
+    <li>$\operatorname{Cov}\left(X_{t}, X_{t-i}\right)=\gamma_{i}, \forall t, \forall i$</li>
+    <li>$E\left[\left|X_{t}\right|^{2}\right]<\infty, \forall t$</li>
+</ol>
+<h3>Moments of a Stationary AR(p)</h3>
+<p>$$\begin{aligned}
+&-E\left[X_{t}\right]=\mu=\frac{c}{1-\sum_{i=1}^{p} \varphi_{i}}, \forall t \\
+&-\operatorname{Var}\left(X_{t}\right)=\gamma_{0}=\sum_{j=1}^{p} \varphi_{j} \gamma_{-j}+\sigma^{2}, \forall t \\
+&-\operatorname{Cov}\left(X_{t}, X_{t-i}\right)=\gamma_{i}=\sum_{j=1}^{p} \varphi_{j} \gamma_{i-j}, \forall t, \forall i \in[1, p] \\
+&-\rho_{i}=\frac{\gamma_{i}}{\gamma_{0}}
+\end{aligned}$$</p>
+<p>Calculating the moments involves simplifying the equations for expectation and variance applied to both sides of the equation:</p>
+<p>$$X_{t}=c+\sum_{i=1}^{p} \varphi_{i} X_{t-i}+\varepsilon_{t}$$</p>
+<img src="image/image_EmzObeZZ5o.png" alt="Moments calculations">
+<h3>Stationarity Test</h3>
+<p>In exams, this can be treated as a theorem:</p>
+<img src="image/image_QQbTRQ5h5z.png" alt="Stationarity Test">
+
+<p>An AR(p) process is stationary if all the roots of the polynomial $1 - \varphi_1 x - \varphi_2 x^2 - \cdots - \varphi_p x^p$ lie outside the unit circle. That is, for all $j$ from 1 to $p$, $|\varphi_j| < 1$.</p>
+<h2>Modeling AR(p)</h2>
+<p>In practice, we have observed data $x_1, x_2, \ldots, x_T$. We would like to estimate the model parameters: $c$, $\varphi_1$, $\ldots$, $\varphi_p$, and $\sigma$. Two common methods are:</p>
+<ol>
+    <li>Least squares method (LS)</li>
+    <li>Maximum likelihood estimation (MLE)</li>
+</ol>
+<p>The least squares method is simpler, while MLE is more complex but provides better estimation.</p>
+<h3>Least Squares Method</h3>
+<p>LS estimation for AR(p) model:</p>
+<p>1. Estimate the mean of the data: $\bar{x} = \frac{1}{T}\sum_{t=1}^{T} x_t$.</p>
+<p>2. Subtract the mean from the data: $x_t = x_t - \bar{x}$.</p>
+<p>3. Form the linear regression problem: $x_t = c + \sum_{i=1}^{p} \varphi_i x_{t-i} + \varepsilon_t$.</p>
+<p>4. Solve the linear regression problem to obtain $\hat{c}$, $\hat{\varphi_1}$, $\ldots$, $\hat{\varphi_p}$.</p>
+<p>5. Estimate the variance: $\hat{\sigma}^2 = \frac{1}{T - p} \sum_{t=p+1}^{T} \left(x_t - \hat{c} - \sum_{i=1}^{p} \hat{\varphi_i} x_{t-i}\right)^2$.</p>
+<h3>Maximum Likelihood Estimation</h3>
+<p>MLE estimation for AR(p) model:</p>
+<p>1. Write down the likelihood function for the Gaussian distribution:</p>
+<p>$$\begin{aligned}
+L\left(c, \varphi_{1}, \ldots, \varphi_{p}, \sigma \mid x_{1}, \ldots, x_{T}\right) &=\prod_{t=p+1}^{T} P\left(x_{t} \mid x_{t-1}, \ldots, x_{t-p}, c, \varphi_{1}, \ldots, \varphi_{p}, \sigma\right) \\
+&=\prod_{t=p+1}^{T} \frac{1}{\sqrt{2 \pi \sigma^{2}}} e^{-\frac{\left(x_{t}-c-\sum_{i=1}^{p} \varphi_{i} x_{t-i}\right)^{2}}{2 \sigma^{2}}}
+\end{aligned}$$</p>
+<p>2. Solve for the values of $c$, $\varphi_1$, $\ldots$, $\varphi_p$, and $\sigma$ that maximize the likelihood function. This can be done numerically using optimization algorithms.</p>
+<p>After obtaining the model parameters, the AR(p) model can be used for forecasting future
